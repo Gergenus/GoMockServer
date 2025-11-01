@@ -1,0 +1,19 @@
+port: 9876
+endpoints:
+  - type: "gg"
+    method: "GET"
+    status: 200
+    path: "/example"
+    xmlpath: "./aniki.xml"
+
+  - type: "aa"
+    method: "POST"
+    status: 200
+    path: "/example"
+    xmlpath: "./aniki.xml"
+
+  - type: "dd"
+    method: "PUT"
+    status: 200
+    path: "/example"
+    xmlpath: "./aniki.xml"
