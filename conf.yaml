@@ -3,7 +3,7 @@ endpoints:
   - type: "gg"
     method: "GET"
     status: 200
-    path: "/example"
+    path: "/scripts/XML_daily.asp?date_req=02/03/2002"
     xmlpath: "./aniki.xml"
 
   - type: "aa"
