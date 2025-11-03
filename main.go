@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log/slog"
 	"net/http"
 	"os"
@@ -14,8 +15,15 @@ import (
 	"github.com/Gergenus/GoMockServer/src/logger"
 )
 
+var (
+	configPath = flag.String("config", "./conf.yaml", "Path to the configuration file")
+)
+
 func main() {
-	cfg, err := config.LoadConfig("./conf.yaml")
+
+	flag.Parse()
+
+	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {
 		panic(err)
 	}

@@ -28,7 +28,6 @@ func NewServer(cfg *config.Config, log *slog.Logger) *Server {
 func (s *Server) HandleRequests(w http.ResponseWriter, r *http.Request) {
 	for _, ep := range s.Config.Endpoints {
 		if ep.Path == r.URL.String() && r.Method == ep.Method {
-			fmt.Println(r.URL.Query())
 			s.log.Debug("matched endpoint",
 				slog.String("path", ep.Path),
 				slog.String("method", ep.Method),
