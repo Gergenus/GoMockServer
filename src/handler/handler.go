@@ -6,51 +6,40 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"strings"
+	"path/filepath"
 
 	"github.com/Gergenus/GoMockServer/src/config"
 )
 
 type Server struct {
 	Config *config.Config
-	Logger *slog.Logger
+	log    *slog.Logger
 }
 
 func NewServer(cfg *config.Config, log *slog.Logger) *Server {
 	s := &Server{
 		Config: cfg,
-		Logger: log,
+		log:    log,
 	}
 
 	return s
 }
 
-func (s *Server) matchPath(pattern, path string) (bool, map[string]string) {
-	if pattern != path {
-		return false, nil
-	}
-
-	queryParamValues := map[string]string{}
-
-	patternParts := strings.Split(pattern, "?")
-	if len(patternParts) == 1 {
-		return true, nil
-	}
-	params := strings.Split(patternParts[1], "&")
-	for _, param := range params {
-		data := strings.Split(param, "=")
-		queryParamValues[data[0]] = data[1]
-	}
-
-	return true, queryParamValues
-}
-
 func (s *Server) HandleRequests(w http.ResponseWriter, r *http.Request) {
 	for _, ep := range s.Config.Endpoints {
-		match, _ := s.matchPath(ep.Path, r.URL.String())
-		if match && r.Method == ep.Method {
-			w.Header().Set("Content-Type", "application/xml")
-			resBody, err := s.getXMLResonse(ep.XMLPath)
+		if ep.Path == r.URL.String() && r.Method == ep.Method {
+			fmt.Println(r.URL.Query())
+			s.log.Debug("matched endpoint",
+				slog.String("path", ep.Path),
+				slog.String("method", ep.Method),
+			)
+			if filepath.Ext(ep.ResponsePath) == ".xml" {
+				w.Header().Set("Content-Type", "application/xml")
+			} else if filepath.Ext(ep.ResponsePath) == ".html" {
+				w.Header().Set("Content-Type", "text/html")
+			}
+
+			resBody, err := s.getResponse(ep.ResponsePath)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`<ValCurs> Internal server error </ValCurs>`))
@@ -67,16 +56,16 @@ func (s *Server) HandleRequests(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<ValCurs> Not found </ValCurs>"))
 }
 
-func (s *Server) getXMLResonse(path string) ([]byte, error) {
+func (s *Server) getResponse(path string) ([]byte, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		s.Logger.Error("error getting xml response", slog.String("error", err.Error()))
+		s.log.Error("error getting response", slog.String("error", err.Error()))
 		return nil, fmt.Errorf("file not found: %w", err)
 	}
 	defer file.Close()
 	response, err := io.ReadAll(file)
 	if err != nil {
-		s.Logger.Error("error reading xml response", slog.String("error", err.Error()))
+		s.log.Error("error reading response", slog.String("error", err.Error()))
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 	return response, nil

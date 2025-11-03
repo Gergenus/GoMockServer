@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 )
@@ -18,16 +17,17 @@ var (
 
 type Config struct {
 	Port      string     `yaml:"port"`
+	LogLevel  string     `yaml:"log_level"`
+	LogFormat string     `yaml:"log_format"`
 	Endpoints []Endpoint `yaml:"endpoints"`
-	mu        sync.RWMutex
 }
 
 type Endpoint struct {
-	Type    string
-	Method  string
-	Status  int
-	Path    string
-	XMLPath string
+	Type         string `yaml:"type"`
+	Method       string `yaml:"method"`
+	Status       int    `yaml:"status"`
+	Path         string `yaml:"path"`
+	ResponsePath string `yaml:"response_path"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -69,9 +69,9 @@ func (c *Config) Validate() error {
 
 		endpointMap[pathMethod] = true
 
-		if ep.XMLPath != "" {
-			if _, err := os.Stat(ep.XMLPath); os.IsNotExist(err) {
-				return fmt.Errorf("%w %s for %s %s", ErrXMLfileNotFound, ep.XMLPath, ep.Path, ep.Method)
+		if ep.ResponsePath != "" {
+			if _, err := os.Stat(ep.ResponsePath); os.IsNotExist(err) {
+				return fmt.Errorf("%w %s for %s %s", ErrXMLfileNotFound, ep.ResponsePath, ep.Path, ep.Method)
 			}
 		}
 	}

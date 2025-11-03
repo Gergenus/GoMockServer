@@ -11,6 +11,7 @@ import (
 
 	"github.com/Gergenus/GoMockServer/src/config"
 	"github.com/Gergenus/GoMockServer/src/handler"
+	"github.com/Gergenus/GoMockServer/src/logger"
 )
 
 func main() {
@@ -19,13 +20,15 @@ func main() {
 		panic(err)
 	}
 
-	log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	log := logger.SetUp(cfg.LogLevel, cfg.LogFormat)
 	s := handler.NewServer(cfg, log)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
 		Handler: http.HandlerFunc(s.HandleRequests),
 	}
+
+	log.Info("starting go mock server")
 
 	serverErrors := make(chan error, 1)
 

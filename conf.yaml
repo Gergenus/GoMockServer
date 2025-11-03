@@ -1,19 +1,39 @@
 port: 9876
+log_level: debug
+log_format: text
 endpoints:
-  - type: "gg"
+  - type: "OK"
     method: "GET"
     status: 200
     path: "/scripts/XML_daily.asp?date_req=02/03/2002"
-    xmlpath: "./aniki.xml"
+    response_path: "./example/ok.xml"
 
-  - type: "aa"
-    method: "POST"
-    status: 200
-    path: "/example"
-    xmlpath: "./aniki.xml"
-
-  - type: "dd"
+  - type: "wrong method"
     method: "PUT"
+    status: 405
+    path: "/scripts/XML_daily.asp?date_req=02/03/2002"
+    response_path: "./example/wrong_method.html"
+
+  - type: "current day"
+    method: "GET"
     status: 200
-    path: "/example"
-    xmlpath: "./aniki.xml"
+    path: "/scripts/XML_daily.asp"
+    response_path: "./example/current_day.xml"
+
+  - type: "incorrect date"
+    method: "GET"
+    status: 200
+    path: "/scripts/XML_daily.asp?date_req=35/11/2025"
+    response_path: "./example/incorrect_parameters.xml"
+
+  - type: "incorrect month"
+    method: "GET"
+    status: 200
+    path: "/scripts/XML_daily.asp?date_req=30/14/2025"
+    response_path: "./example/incorrect_parameters.xml"
+
+  - type: "internal"
+    method: "GET"
+    status: 500
+    path: "/scripts/XML_daily.asp?date_req=03/03/2002"
+    response_path: "./example/error.xml"
