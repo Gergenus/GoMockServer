@@ -73,6 +73,8 @@ go run . --config=./custom-config.yaml
 | `log_format` | формат логов (text, json) | 
 | `endpoints` | массив конфигурацией эндпоинтов | 
 
+### Endpoint Configuration
+
 | Опция | Описание |
 |--------|-------------|
 | `method` | HTTP метод (GET, POST, PUT, DELETE, etc.) | 
